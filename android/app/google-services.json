@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "918330315982",
+    "project_id": "chat-app-a4f5b",
+    "storage_bucket": "chat-app-a4f5b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:918330315982:android:64d9879080c804478d6c9f",
+        "android_client_info": {
+          "package_name": "com.juanacosta.chat_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "918330315982-hfvma0urmbn7hse83i2mrt478bv7j8bo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAFoUO1oXElHA3HHN1ZV3Fx4vuzQcJLy-E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "918330315982-hfvma0urmbn7hse83i2mrt478bv7j8bo.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
