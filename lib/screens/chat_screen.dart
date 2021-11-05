@@ -4,32 +4,48 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 import 'dart:convert';
 import 'package:web_socket_channel/io.dart';
 import 'package:intl/intl.dart';
-import 'package:chat_app/screens/chat_screen.dart';
 import 'package:chat_app/services/secure_storage.dart';
 
-class ChatScreen extends StatefulWidget {
+class ChatScreen extends StatelessWidget {
   static const id = 'chat_screen';
 
   @override
-  _ChatScreenState createState() => _ChatScreenState();
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: SecureStorage().readSecureData('token'),
+      builder: (context, snapshot) {
+        WebSocketChannel _channel = IOWebSocketChannel.connect(
+            "ws://10.0.2.2:8000/ws/chat/lobby/",
+            headers: {'authorization': 'Token $snapshot.data'});
+        return ChatScreenStatefull(_channel);
+      },
+    );
+  }
 }
 
-class _ChatScreenState extends State<ChatScreen> {
+class ChatScreenStatefull extends StatefulWidget {
+  final WebSocketChannel _channel;
+  ChatScreenStatefull(this._channel);
+
+  @override
+  _ChatScreenStatefullState createState() => _ChatScreenStatefullState();
+}
+
+class _ChatScreenStatefullState extends State<ChatScreenStatefull> {
   final messageTextController = TextEditingController();
   late String messageText;
   List<MessageBubble> messageWidgets = [];
-  final WebSocketChannel _channel =
-      IOWebSocketChannel.connect("ws://10.0.2.2:8000/ws/chat/lobby/", headers: {
-    'authorization': 'Token aea5468b3173c5574bd1fb06f6b16eb5c7eef2bf'
-  });
-
-  // var _channel =
-  //     WebSocketChannel.connect(Uri.parse('ws://10.0.2.2:8000/ws/chat/lobby/'));
+  late final WebSocketChannel _channel;
 
   @override
   void initState() {
+    _channel = widget._channel;
     super.initState();
-    preloadMessages();
+    var data = jsonEncode({
+      "command": 'fetch_messages',
+      "chatgroup": 'lobby',
+    });
+    _channel.sink.add(data);
   }
 
   List<MessageBubble> createBubbleList(List bubbleList) {
@@ -38,15 +54,6 @@ class _ChatScreenState extends State<ChatScreen> {
       lst.add(i);
     }
     return lst;
-  }
-
-// TODO: Chat group needs to be variable
-  void preloadMessages() {
-    var data = jsonEncode({
-      "command": 'fetch_messages',
-      "chatgroup": 'lobby',
-    });
-    _channel.sink.add(data);
   }
 
   @override
@@ -58,8 +65,7 @@ class _ChatScreenState extends State<ChatScreen> {
           IconButton(
               icon: Icon(Icons.close),
               onPressed: () {
-                final SecureStorage secureStorage = SecureStorage();
-                secureStorage.readSecureData('token');
+                setState(() {});
               }),
         ],
         title: Text('⚡️Chat'),
@@ -72,7 +78,6 @@ class _ChatScreenState extends State<ChatScreen> {
             StreamBuilder(
                 stream: _channel.stream,
                 builder: (context, snapshot) {
-                  print('streambuilder');
                   if (snapshot.hasData) {
                     final codedMessages = snapshot.data as String;
                     final messages = jsonDecode(codedMessages);
@@ -93,6 +98,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         isMe: isMe,
                         timeSent: timeSent,
                       );
+                      print(snapshot.connectionState);
 
                       messageWidgets.add(messageWidget);
                     }
@@ -134,6 +140,15 @@ class _ChatScreenState extends State<ChatScreen> {
                     },
                     child: Text(
                       'Send',
+                      style: kSendButtonTextStyle,
+                    ),
+                  ),
+                  FlatButton(
+                    onPressed: () {
+                      setState(() {});
+                    },
+                    child: Text(
+                      'Test',
                       style: kSendButtonTextStyle,
                     ),
                   ),

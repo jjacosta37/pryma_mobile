@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:chat_app/screens/welcome_screen.dart';
 import 'package:chat_app/screens/login_screen.dart';
 import 'package:chat_app/screens/registration_screen.dart';
-import 'package:chat_app/screens/chat_screen.dart';
+import 'package:chat_app/screens/chat_screen2.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 void main() => runApp(FlashChat());

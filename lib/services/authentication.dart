@@ -18,7 +18,7 @@ class Authentication {
       String jsonData = response.body;
       Map data = jsonDecode(jsonData);
       final SecureStorage secureStorage = SecureStorage();
-      secureStorage.writeSecureData('token', data['token']);
+      await secureStorage.writeSecureData('token', data['token']);
     } else {
       throw Exception('Wrong credentials');
     }
