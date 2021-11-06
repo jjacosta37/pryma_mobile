@@ -1,11 +1,10 @@
+import 'package:chat_app/screens/suppliers_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:chat_app/widgets/rounded_button.dart';
 import 'package:chat_app/constants.dart';
-import 'package:chat_app/screens/chat_screen.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:chat_app/services/authentication.dart';
-import 'package:chat_app/services/secure_storage.dart';
 
 class LoginScreen extends StatefulWidget {
   static const id = 'login_screen';
@@ -28,7 +27,7 @@ class _LoginScreenState extends State<LoginScreen> {
         loginFail = false;
         showSpinner = false;
       });
-      Navigator.pushNamed(context, ChatScreen.id);
+      Navigator.pushNamed(context, SupplierScreen.id);
     } catch (e) {
       setState(() {
         loginFail = true;
@@ -81,12 +80,13 @@ class _LoginScreenState extends State<LoginScreen> {
                   },
                   decoration: kTextFieldAnotation.copyWith(
                       hintText: 'Enter your password',
-                      errorText: loginFail ? 'wrong credentials' : null)),
+                      errorText:
+                          loginFail ? 'Invalid Username or Password' : null)),
               SizedBox(
                 height: 24.0,
               ),
               RoundedButton(
-                  color: Colors.lightBlueAccent,
+                  color: Colors.blueAccent,
                   title: 'Log in',
                   onPressed: () async {
                     setState(() {

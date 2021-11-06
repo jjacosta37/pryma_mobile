@@ -1,4 +1,3 @@
-import 'package:chat_app/screens/chat_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:chat_app/widgets/rounded_button.dart';
 import 'package:chat_app/constants.dart';

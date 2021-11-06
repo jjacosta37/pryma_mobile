@@ -34,7 +34,6 @@ class ChatScreenStatefull extends StatefulWidget {
 class _ChatScreenStatefullState extends State<ChatScreenStatefull> {
   final messageTextController = TextEditingController();
   late String messageText;
-  List<MessageBubble> messageWidgets = [];
   late final WebSocketChannel _channel;
 
   @override
@@ -48,14 +47,6 @@ class _ChatScreenStatefullState extends State<ChatScreenStatefull> {
     _channel.sink.add(data);
   }
 
-  List<MessageBubble> createBubbleList(List bubbleList) {
-    List<MessageBubble> lst = [];
-    for (var i in bubbleList.reversed) {
-      lst.add(i);
-    }
-    return lst;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -65,7 +56,7 @@ class _ChatScreenStatefullState extends State<ChatScreenStatefull> {
           IconButton(
               icon: Icon(Icons.close),
               onPressed: () {
-                setState(() {});
+                Navigator.pop(context);
               }),
         ],
         title: Text('⚡️Chat'),
@@ -75,44 +66,7 @@ class _ChatScreenStatefullState extends State<ChatScreenStatefull> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            StreamBuilder(
-                stream: _channel.stream,
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    final codedMessages = snapshot.data as String;
-                    final messages = jsonDecode(codedMessages);
-                    for (var message in messages!) {
-                      // TODO: Current user needs to be variable
-                      final currentUser = 'jjacosta37@gmail.com';
-                      final timeSent = new DateTime.now();
-
-                      final messageText = message['message'];
-                      final messageSender = message['sender'];
-                      bool isMe = currentUser == messageSender;
-
-                      // Got to fix this
-
-                      final messageWidget = MessageBubble(
-                        sender: messageSender,
-                        text: messageText,
-                        isMe: isMe,
-                        timeSent: timeSent,
-                      );
-                      print(snapshot.connectionState);
-
-                      messageWidgets.add(messageWidget);
-                    }
-                  }
-
-                  return Expanded(
-                    child: ListView(
-                      reverse: true,
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-                      children: createBubbleList(messageWidgets),
-                    ),
-                  );
-                }),
+            MessageStream(_channel),
             Container(
               decoration: kMessageContainerDecoration,
               child: Row(
@@ -143,15 +97,6 @@ class _ChatScreenStatefullState extends State<ChatScreenStatefull> {
                       style: kSendButtonTextStyle,
                     ),
                   ),
-                  FlatButton(
-                    onPressed: () {
-                      setState(() {});
-                    },
-                    child: Text(
-                      'Test',
-                      style: kSendButtonTextStyle,
-                    ),
-                  ),
                 ],
               ),
             ),
@@ -159,6 +104,60 @@ class _ChatScreenStatefullState extends State<ChatScreenStatefull> {
         ),
       ),
     );
+  }
+}
+
+class MessageStream extends StatelessWidget {
+  MessageStream(this._channel);
+  final WebSocketChannel _channel;
+  List<MessageBubble> messageWidgets = [];
+
+  List<MessageBubble> createBubbleList(List bubbleList) {
+    List<MessageBubble> lst = [];
+    for (var i in bubbleList.reversed) {
+      lst.add(i);
+    }
+    return lst;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder(
+        stream: _channel.stream,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            final codedMessages = snapshot.data as String;
+            final messages = jsonDecode(codedMessages);
+            for (var message in messages!) {
+              // TODO: Current user needs to be variable
+              final currentUser = 'jjacosta37@gmail.com';
+              final timeSent = new DateTime.now();
+
+              final messageText = message['message'];
+              final messageSender = message['sender'];
+              bool isMe = currentUser == messageSender;
+
+              // Got to fix this
+
+              final messageWidget = MessageBubble(
+                sender: messageSender,
+                text: messageText,
+                isMe: isMe,
+                timeSent: timeSent,
+              );
+              print(snapshot.connectionState);
+
+              messageWidgets.add(messageWidget);
+            }
+          }
+          return Expanded(
+            child: ListView(
+              reverse: true,
+              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+              children: createBubbleList(messageWidgets),
+            ),
+          );
+        });
   }
 }
 
