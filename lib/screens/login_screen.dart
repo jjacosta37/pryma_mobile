@@ -81,13 +81,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   },
                   decoration: kTextFieldAnotation.copyWith(
                       hintText: 'Enter your password',
-                      errorText:
-                          loginFail ? 'Invalid Username or Password' : null)),
+                      errorText: loginFail ? 'wrong credentials' : null)),
               SizedBox(
                 height: 24.0,
               ),
               RoundedButton(
-                  color: Colors.blueAccent,
+                  color: Colors.lightBlueAccent,
                   title: 'Log in',
                   onPressed: () async {
                     setState(() {
