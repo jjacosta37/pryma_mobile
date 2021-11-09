@@ -34,3 +34,5 @@ const kTextFieldAnotation = InputDecoration(
     borderRadius: BorderRadius.all(Radius.circular(32.0)),
   ),
 );
+
+const kServerBaseURL = 'http://10.0.2.2:8000';

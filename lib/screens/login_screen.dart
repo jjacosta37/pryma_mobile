@@ -1,10 +1,11 @@
-import 'package:chat_app/screens/suppliers_screen.dart';
+import 'package:chat_app/screens/supplier_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:chat_app/widgets/rounded_button.dart';
 import 'package:chat_app/constants.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:chat_app/services/authentication.dart';
+import 'package:chat_app/screens/loading_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   static const id = 'login_screen';
@@ -27,7 +28,7 @@ class _LoginScreenState extends State<LoginScreen> {
         loginFail = false;
         showSpinner = false;
       });
-      Navigator.pushNamed(context, SupplierScreen.id);
+      Navigator.pushNamed(context, LoadingScreen.id);
     } catch (e) {
       setState(() {
         loginFail = true;

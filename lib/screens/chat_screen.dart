@@ -5,9 +5,18 @@ import 'dart:convert';
 import 'package:web_socket_channel/io.dart';
 import 'package:intl/intl.dart';
 import 'package:chat_app/services/secure_storage.dart';
+import 'package:chat_app/services/http_requests.dart';
 
 class ChatScreen extends StatelessWidget {
   static const id = 'chat_screen';
+  String groupName;
+  String supplierName;
+  String userName;
+
+  ChatScreen(
+      {required this.groupName,
+      required this.supplierName,
+      required this.userName});
 
   @override
   Widget build(BuildContext context) {
@@ -15,9 +24,9 @@ class ChatScreen extends StatelessWidget {
       future: SecureStorage().readSecureData('token'),
       builder: (context, snapshot) {
         WebSocketChannel _channel = IOWebSocketChannel.connect(
-            "ws://10.0.2.2:8000/ws/chat/lobby/",
+            "ws://10.0.2.2:8000/ws/chat/$groupName/",
             headers: {'authorization': 'Token $snapshot.data'});
-        return ChatScreenStatefull(_channel);
+        return ChatScreenStatefull(_channel, groupName, supplierName, userName);
       },
     );
   }
@@ -25,7 +34,11 @@ class ChatScreen extends StatelessWidget {
 
 class ChatScreenStatefull extends StatefulWidget {
   final WebSocketChannel _channel;
-  ChatScreenStatefull(this._channel);
+  String groupName;
+  String supplierName;
+  String userName;
+  ChatScreenStatefull(
+      this._channel, this.groupName, this.supplierName, this.userName);
 
   @override
   _ChatScreenStatefullState createState() => _ChatScreenStatefullState();
@@ -35,6 +48,7 @@ class _ChatScreenStatefullState extends State<ChatScreenStatefull> {
   final messageTextController = TextEditingController();
   late String messageText;
   late final WebSocketChannel _channel;
+  final httpRequestBack = HttpRequestBack();
 
   @override
   void initState() {
@@ -42,7 +56,7 @@ class _ChatScreenStatefullState extends State<ChatScreenStatefull> {
     super.initState();
     var data = jsonEncode({
       "command": 'fetch_messages',
-      "chatgroup": 'lobby',
+      "chatgroup": widget.groupName,
     });
     _channel.sink.add(data);
   }
@@ -55,18 +69,23 @@ class _ChatScreenStatefullState extends State<ChatScreenStatefull> {
         actions: <Widget>[
           IconButton(
               icon: Icon(Icons.close),
-              onPressed: () {
-                Navigator.pop(context);
+              onPressed: () async {
+                dynamic data = await httpRequestBack.getSupplierScreenData();
+                dynamic decodedData = jsonDecode(data.body);
+                Navigator.pop(context, decodedData);
               }),
         ],
-        title: Text('⚡️Chat'),
+        title: Text(
+          widget.supplierName,
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
+        ),
       ),
       body: SafeArea(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            MessageStream(_channel),
+            MessageStream(_channel, widget.userName),
             Container(
               decoration: kMessageContainerDecoration,
               child: Row(
@@ -87,8 +106,8 @@ class _ChatScreenStatefullState extends State<ChatScreenStatefull> {
                       var data = jsonEncode({
                         "command": 'send_chat_message',
                         "message": messageText,
-                        "sender": 'jjacosta37@gmail.com',
-                        "chatgroup": 'lobby',
+                        "sender": widget.userName,
+                        "chatgroup": widget.groupName,
                       });
                       _channel.sink.add(data);
                     },
@@ -108,9 +127,11 @@ class _ChatScreenStatefullState extends State<ChatScreenStatefull> {
 }
 
 class MessageStream extends StatelessWidget {
-  MessageStream(this._channel);
   final WebSocketChannel _channel;
   List<MessageBubble> messageWidgets = [];
+  String username;
+
+  MessageStream(this._channel, this.username);
 
   List<MessageBubble> createBubbleList(List bubbleList) {
     List<MessageBubble> lst = [];
@@ -129,8 +150,7 @@ class MessageStream extends StatelessWidget {
             final codedMessages = snapshot.data as String;
             final messages = jsonDecode(codedMessages);
             for (var message in messages!) {
-              // TODO: Current user needs to be variable
-              final currentUser = 'jjacosta37@gmail.com';
+              final currentUser = username;
               final timeSent = new DateTime.now();
 
               final messageText = message['message'];
@@ -189,16 +209,7 @@ class MessageBubble extends StatelessWidget {
             ),
           ),
           Material(
-            borderRadius: isMe
-                ? BorderRadius.only(
-                    topLeft: Radius.circular(30.0),
-                    bottomLeft: Radius.circular(30.0),
-                    bottomRight: Radius.circular(30.0))
-                : BorderRadius.only(
-                    bottomLeft: Radius.circular(30.0),
-                    bottomRight: Radius.circular(30.0),
-                    topRight: Radius.circular(30.0),
-                  ),
+            borderRadius: BorderRadius.all(Radius.circular(20)),
             elevation: 1.0,
             color: isMe ? Colors.blueAccent : Colors.white,
             child: Padding(

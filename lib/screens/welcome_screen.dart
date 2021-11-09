@@ -1,9 +1,10 @@
+import 'package:chat_app/screens/loading_screen.dart';
 import 'package:chat_app/screens/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:chat_app/widgets/rounded_button.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:chat_app/screens/suppliers_screen.dart';
+import 'package:chat_app/screens/supplier_screen.dart';
 
 class WelcomeScreen extends StatefulWidget {
   static const id = 'welcome_screen';
@@ -58,7 +59,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                 color: Colors.blueAccent,
                 title: 'Register',
                 onPressed: () {
-                  Navigator.pushNamed(context, SupplierScreen.id);
+                  Navigator.pushNamed(context, LoadingScreen.id);
                 }),
           ],
         ),

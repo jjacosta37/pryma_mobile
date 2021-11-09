@@ -4,7 +4,8 @@ import 'package:chat_app/screens/login_screen.dart';
 import 'package:chat_app/screens/registration_screen.dart';
 import 'package:chat_app/screens/chat_screen.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:chat_app/screens/suppliers_screen.dart';
+import 'package:chat_app/screens/supplier_screen.dart';
+import 'screens/loading_screen.dart';
 
 void main() => runApp(FlashChat());
 
@@ -21,8 +22,8 @@ class FlashChat extends StatelessWidget {
         WelcomeScreen.id: (context) => WelcomeScreen(),
         LoginScreen.id: (context) => LoginScreen(),
         RegistrationScreen.id: (context) => RegistrationScreen(),
-        ChatScreen.id: (context) => ChatScreen(),
         SupplierScreen.id: (context) => SupplierScreen(),
+        LoadingScreen.id: (context) => LoadingScreen(),
       },
     );
   }

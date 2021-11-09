@@ -1,8 +1,11 @@
+// Token Authentication Services
+
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:chat_app/services/secure_storage.dart';
+import 'package:chat_app/constants.dart';
 
-const serverURL = 'http://10.0.2.2:8000/api-token-auth/';
+const serverURL = '$kServerBaseURL/api-token-auth/';
 
 class Authentication {
   Future<void> authenticateUser(String username, String password) async {

@@ -1,3 +1,5 @@
+// Services to store and retrieve token information in Local Storage
+
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class SecureStorage {
