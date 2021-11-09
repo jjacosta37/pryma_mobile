@@ -3,6 +3,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'dart:convert';
 import 'package:chat_app/screens/supplier_screen.dart';
 import 'package:chat_app/services/http_requests.dart';
+import 'package:chat_app/services/secure_storage.dart';
 
 class LoadingScreen extends StatefulWidget {
   static const id = 'loading_screen';
@@ -23,11 +24,13 @@ class _LoadingScreenState extends State<LoadingScreen> {
   void getDataAndPushScreen() async {
     final response = await httpRequestBack.getSupplierScreenData();
     final responseJson = jsonDecode(response.body);
+    final token = await SecureStorage().readSecureData('token');
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => SupplierScreen(
           data: responseJson,
+          token: token,
         ),
       ),
     );

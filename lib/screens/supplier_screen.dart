@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:chat_app/screens/chat_screen.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:web_socket_channel/io.dart';
+import 'dart:convert';
 
 class SupplierScreen extends StatefulWidget {
   static const id = 'suppliers_screen';
   dynamic data;
-  SupplierScreen({this.data});
+  dynamic token;
+  SupplierScreen({this.data, this.token});
 
   @override
   State<SupplierScreen> createState() => _SupplierScreenState();
@@ -41,6 +45,7 @@ class _SupplierScreenState extends State<SupplierScreen> {
           userName: data[2],
           lastMessage: data[3][groupName],
           rebuildCards: callBack,
+          token: widget.token,
         );
         supplierList.add(card);
       }
@@ -77,13 +82,15 @@ class SupplierCard extends StatelessWidget {
   String userName;
   String lastMessage;
   void Function(dynamic) rebuildCards;
+  dynamic token;
 
   SupplierCard(
       {required this.name,
       required this.groupName,
       required this.userName,
       required this.lastMessage,
-      required this.rebuildCards});
+      required this.rebuildCards,
+      required this.token});
 
   @override
   Widget build(BuildContext context) {
@@ -128,6 +135,9 @@ class SupplierCard extends StatelessWidget {
             ),
             LatestMessage(
               lastMessage: lastMessage,
+              channel: IOWebSocketChannel.connect(
+                  "ws://10.0.2.2:8000/ws/chat/$groupName/",
+                  headers: {'authorization': 'Token $token'}),
             ),
           ],
         ),
@@ -160,17 +170,27 @@ class SupplierCard extends StatelessWidget {
 // TODO: This should have a streambuilder that listens for new messages
 class LatestMessage extends StatelessWidget {
   String lastMessage;
-  LatestMessage({required this.lastMessage});
+  final WebSocketChannel channel;
+  LatestMessage({required this.lastMessage, required this.channel});
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: Text(
-        lastMessage,
-        style: TextStyle(color: Colors.black38),
-        overflow: TextOverflow.ellipsis,
-        softWrap: false,
-      ),
-    );
+    return StreamBuilder(
+        stream: channel.stream,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            final codedMessages = snapshot.data as String;
+            final message = jsonDecode(codedMessages);
+            lastMessage = message[0]['message'];
+          }
+          return Expanded(
+            child: Text(
+              lastMessage,
+              style: TextStyle(color: Colors.black38),
+              overflow: TextOverflow.ellipsis,
+              softWrap: false,
+            ),
+          );
+        });
   }
 }
